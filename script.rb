@@ -70,6 +70,7 @@ def launch
     end
     Launchy.open(link)
     sleep 0.4
+    opener += 1
   end
 end
 
