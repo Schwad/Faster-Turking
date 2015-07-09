@@ -62,7 +62,12 @@ def analyze
 end
 
 def launch
+  opener = 0
   @links.each do |link|
+    if opener % 15 == 0
+      puts "continue opening?"
+      gets.chomp
+    end
     Launchy.open(link)
     sleep 0.4
   end
