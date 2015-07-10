@@ -58,7 +58,7 @@ def click_through_pages(starter_page, type)
         @page += 1
       end
     elsif type == 'forum'
-      if starter_page.links_with(:text => /Next/).length == 2
+      if starter_page.links_with(:text => /Next/).length == 1
         puts "Out of pages!"
         @new_pages = false
       else
@@ -84,7 +84,7 @@ end
 
 def launch
   opener = 0
-  @links.each do |link|
+  @links.reverse_each do |link|
     if opener % 15 == 0
       puts "continue opening?"
       gets.chomp
