@@ -7,13 +7,16 @@ require 'open-uri'
 def welcome
 
   puts "Welcome to Faster-Turking!"
-  print "Enter website:"
-  @website = gets.chomp
+  print "Enter MTURKGRIND website:"
+  @mturkgrind = gets.chomp
+  print "Enter MTURKFORUM website:"
+  @mturkforum = gets.chomp
 
 end
 
 def initialize_mechanize
   @a = Mechanize.new
+  @b = Mechanize.new
 end
 
 def inspect_links(page)
@@ -43,7 +46,7 @@ def click_through_pages(starter_page)
   @page = 1
   @new_pages = true
   while @new_pages
-    puts "Compiling links on page #{@page}"
+    puts "Compiling MTURKGRIND links on page #{@page}"
     bring_in_links(starter_page)
     if starter_page.links_with(:text => /Next/).last == nil
       @new_pages = false
@@ -52,15 +55,19 @@ def click_through_pages(starter_page)
       @page += 1
     end
   end
-  puts "Links compiled! Total number is #{@links.length}"
+  puts "Links compiled! Total number is now #{@links.length}"
   puts "Total pages was #{@page}"
+  sleep 3
 end
+
 
 def analyze
   puts "Analyzing..."
-  @a = @a.get(@website)
+  @a = @a.get(@mturkgrind)
+  @b = @b.get(@mturkforum)
   @links = []
   click_through_pages(@a)
+  click_through_pages(@b)
 end
 
 def launch
