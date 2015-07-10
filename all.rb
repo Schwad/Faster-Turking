@@ -27,14 +27,18 @@ def inspect_links(page)
   end
 end
 
-def bring_in_links(new_page)
+def bring_in_links(new_page, type)
   new_page.links_with(:href => %r{/mturk/}).each do |link|
-    unless @links.include?(link.uri.to_s)
+    unless @links.flatten.include?(link.uri.to_s)
       new_page = link.click
       sleep 0.15
       if inspect_links(new_page) == true
         puts "Good link!"
-        @links << link.uri.to_s
+        if type == "grind"
+          @links[0] << link.uri.to_s
+        elsif type == "forum"
+          @links[1] << link.uri.to_s
+        end
       else
         puts "Bad Link!"
       end
@@ -47,7 +51,7 @@ def click_through_pages(starter_page, type)
   @new_pages = true
   while @new_pages
     puts "Compiling #{type} links on page #{@page}"
-    bring_in_links(starter_page)
+    bring_in_links(starter_page, type)
 
     if type == 'grind'
       if starter_page.links_with(:text => /Next/).last == nil
@@ -77,14 +81,27 @@ def analyze
   puts "Analyzing..."
   @a = @a.get(@mturkgrind)
   @b = @b.get(@mturkforum)
-  @links = []
+  @links = [[],[]]
   click_through_pages(@a, 'grind')
   click_through_pages(@b, 'forum')
 end
 
 def launch
   opener = 0
-  @links.reverse_each do |link|
+  switcher = 0
+  link_num = @links.flatten.length
+  final_links = []
+  link_num.times do
+    final_links << @links[switcher].pop
+    if switcher == 0
+      switcher += 1
+    elsif switcher == 1
+      switcher -= 1
+    else
+      puts "Switcher error"
+    end
+  end
+  final_links.reverse_each do |link|
     if opener % 15 == 0
       puts "continue opening?"
       gets.chomp
