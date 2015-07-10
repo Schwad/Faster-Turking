@@ -71,7 +71,7 @@ def click_through_pages(starter_page, type)
       end
     end
   end
-  puts "Links compiled! Total number is now #{@links.length}"
+  puts "Links compiled! Total number is now #{@links.flatten.length}"
   puts "Total pages was #{@page}"
   sleep 3
 end
