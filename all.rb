@@ -42,17 +42,29 @@ def bring_in_links(new_page)
   end
 end
 
-def click_through_pages(starter_page)
+def click_through_pages(starter_page, type)
   @page = 1
   @new_pages = true
   while @new_pages
-    puts "Compiling MTURKGRIND links on page #{@page}"
+    puts "Compiling #{type} links on page #{@page}"
     bring_in_links(starter_page)
-    if starter_page.links_with(:text => /Next/).last == nil
-      @new_pages = false
-    else
-      starter_page = starter_page.links_with(:text => /Next/).last.click
-      @page += 1
+
+    if type == 'grind'
+      if starter_page.links_with(:text => /Next/).last == nil
+        puts "Out of pages!"
+        @new_pages = false
+      else
+       starter_page = starter_page.links_with(:text => /Next/).last.click
+        @page += 1
+      end
+    elsif type == 'forum'
+      if starter_page.links_with(:text => /Next/).length == 2
+        puts "Out of pages!"
+        @new_pages = false
+      else
+        starter_page = starter_page.links_with(:text => /Next/)[-3].click
+        @page += 1
+      end
     end
   end
   puts "Links compiled! Total number is now #{@links.length}"
@@ -66,8 +78,8 @@ def analyze
   @a = @a.get(@mturkgrind)
   @b = @b.get(@mturkforum)
   @links = []
-  click_through_pages(@a)
-  click_through_pages(@b)
+  click_through_pages(@a, 'grind')
+  click_through_pages(@b, 'forum')
 end
 
 def launch
