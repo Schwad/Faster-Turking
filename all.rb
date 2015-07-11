@@ -4,6 +4,9 @@ require 'pry-byebug'
 require 'launchy'
 require 'open-uri'
 
+#Stepping away from feature to open links in reverse order from both pages. Just general reverse now.
+
+
 def welcome
 
   puts "Welcome to Faster-Turking!"
@@ -84,7 +87,7 @@ end
 
 def launch
   opener = 0
-  @links.each do |link|
+  @links.reverse_each do |link|
     if opener % 15 == 0
       puts "continue opening?"
       gets.chomp
