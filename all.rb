@@ -32,15 +32,23 @@ end
 
 def bring_in_links(new_page)
   new_page.links_with(:href => %r{/mturk/}).each do |link|
-    unless @links.include?(link.uri.to_s)
-      new_page = link.click
-      sleep 0.15
-      if inspect_links(new_page) == true
-        puts "Good link!"
-        @links << link.uri.to_s
-      else
-        puts "Bad Link!"
+    begin
+      unless @links.include?(link.uri.to_s)
+        begin
+          new_page = link.click
+          sleep 0.15
+          if inspect_links(new_page) == true
+            puts "Good link!"
+            @links << link.uri.to_s
+          else
+            puts "Bad Link!"
+          end
+        rescue
+          puts "Page error in bring_in_links -unless-!"
+        end
       end
+    rescue
+      puts "Page error in bring_in_links!"
     end
   end
 end
@@ -51,26 +59,28 @@ def click_through_pages(starter_page, type)
   while @new_pages
     puts "Compiling #{type} links on page #{@page}"
     bring_in_links(starter_page)
-
-    if type == 'grind'
-      if starter_page.links_with(:text => /Next/).last == nil
-        puts "Out of pages!"
-        @new_pages = false
-      else
-       starter_page = starter_page.links_with(:text => /Next/).last.click
-        @page += 1
+    begin
+      if type == 'grind'
+        if starter_page.links_with(:text => /Next/).last == nil
+          puts "Out of pages!"
+          @new_pages = false
+        else
+         starter_page = starter_page.links_with(:text => /Next/).last.click
+          @page += 1
+        end
+      elsif type == 'forum'
+        if starter_page.links_with(:text => /Next/)[-3] == nil
+          @new_pages = false
+        else
+          starter_page = starter_page.links_with(:text => /Next/)[-3].click
+          @page += 1
+        end
       end
-    elsif type == 'forum'
-      if starter_page.links_with(:text => /Next/).length == 2
-        puts "Out of pages!"
-        @new_pages = false
-      else
-        starter_page = starter_page.links_with(:text => /Next/)[-3].click
-        @page += 1
-      end
+    rescue
+      puts "Page error in click_through_pages"
     end
   end
-  puts "Links compiled! Total number is now #{@links.length}"
+  puts "Links compiled! Total #{type} number is now #{@links.length}"
   puts "Total pages was #{@page}"
   sleep 3
 end
