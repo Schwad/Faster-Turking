@@ -58,7 +58,7 @@ def click_through_pages(starter_page, type)
   @new_pages = true
   while @new_pages
     puts "Compiling #{type} links on page #{@page}"
-    bring_in_links(starter_page)
+    bring_in_links(starter_page, type)
     begin
       if type == 'grind'
         if starter_page.links_with(:text => /Next/).last == nil
